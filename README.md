@@ -4,18 +4,21 @@
 
 <!-- TOC -->
 
-- [Introduction](##introduction)
-- [Installation instructions](##installation-instructions)
-    - [Installation (recommended)](###Installation (recommended))
-    - [Docker container](###Docker container)
-    - [Optional: update youtube-dl](###Optional: update youtube-dl)
-- [Quick Start](##Quick Start)
-    - [Examples](###Examples)
-- [Troubleshooting](##Troubleshooting)
-    - [China issues](###china-issues)
-- [Reporting issues](#reporting-issues)
-- [Disclaimer](#disclaimer)
-    <!-- /TOC -->
+  * [Introduction](#introduction)
+  * [Installation instructions](#installation-instructions)
+    + [Installation (recommended)](#installation-recommended)
+    + [Manual Installation](#manual-installation)
+    + [Docker container](#docker-container)
+    + [Optional: update youtube-dl](#optional-update-youtube-dl)
+  * [Quick Start](#quick-start)
+    + [Examples](#examples)
+  * [Troubleshooting](#troubleshooting)
+    + [china-issues](#china-issues)
+  * [Reporting issues](#reporting-issues)
+  * [Supported sites](#supported-sites)
+  * [Disclaimer](#disclaimer)
+
+  <!-- /TOC -->
 
 
 
