@@ -1,5 +1,5 @@
-[![Build Status](https://github.com/csyezheng/edx-helper/workflows/Run%20Unit%20Tests/badge.svg)](https://github.com/csyezheng/edx-helper/workflows)
-[![Coverage Status](https://coveralls.io/repos/csyezheng/edx-helper/badge.svg?branch=master&service=github)](https://coveralls.io/github/csyezheng/edx-helper?branch=master)
+[![Build Status](https://github.com/csyezheng/edx-helper/workflows/Run%20Unit%20Tests/badge.svg)](https://github.com/csyezheng/edx-helper/actions/workflows/)
+[![Coverage Status](https://coveralls.io/repos/csyezheng/edx-helper/badge.svg?branch=main&service=github)](https://coveralls.io/github/csyezheng/edx-helper?branch=master)
 [![Code Climate](https://codeclimate.com/github/csyezheng/edx-helper/badges/gpa.svg)](https://codeclimate.com/github/csyezheng/edx-helper)
 [![PyPI version](https://badge.fury.io/py/edx-helper.svg)](https://badge.fury.io/py/edx-helper)
 
