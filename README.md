@@ -1,3 +1,8 @@
+[![Build Status](https://github.com/csyezheng/edx-helper/workflows/Run%20Unit%20Tests/badge.svg)](https://github.com/csyezheng/edx-helper/workflows)
+[![Coverage Status](https://coveralls.io/repos/csyezheng/edx-helper/badge.svg?branch=master&service=github)](https://coveralls.io/github/csyezheng/edx-helper?branch=master)
+[![Code Climate](https://codeclimate.com/github/csyezheng/edx-helper/badges/gpa.svg)](https://codeclimate.com/github/csyezheng/edx-helper)
+[![PyPI version](https://badge.fury.io/py/edx-helper.svg)](https://badge.fury.io/py/edx-helper)
+
 # edx-helper
 
 `edx-helper` is forked from [edx-dl](https://github.com/coursera-dl/edx-dl) which is no longer maintained.
@@ -47,7 +52,6 @@ Opening a terminal and typing the command If you have installed Python:
 To install all the dependencies please do:
 
     pip install -r requirements.txt
-    pip install -r requirements-dev.txt
 
 ### Docker container
 
@@ -74,7 +78,7 @@ the simplest is to simply use:
 
 ## Quick Start
 
-Run the following command to query the usage and usage options:
+Run the following command to query the usage and options:
 
 ```
 edx-helper --help
@@ -150,7 +154,7 @@ Before reporting any issue please follow the steps below:
    
 2. If you get an error like `"YouTube said: Please sign in to view this video."`, then we can't do much about it. You can try to pass your credentials to `youtube-dl` (see https://github.com/rg3/youtube-dl#authentication-options) with the use of `edx-helper`'s option `--youtube-dl-options`. If it doesn't work, then you will have to tell `edx-helper` to ignore the download of that particular video with the option `--ignore-errors`.
    
-3. If the problem persists, feel free to [open an issue][https://github.com/csyezheng/edx-helper/issues] in our bug tracker, please fill the issue template with *as much information as
+3. If the problem persists, feel free to [open an issue](https://github.com/csyezheng/edx-helper/issues) in our bug tracker, please fill the issue template with *as much information as
 possible*.
 
 ## Supported sites
@@ -167,7 +171,7 @@ These are the current supported sites:
 - ~~[GW Online Open](http://mooc.online.gwu.edu/) - George Washington University~~
 
 This is the full [list of sites powered by Open edX][https://github.com/edx/edx-platform/wiki/Sites-powered-by-Open-edX]. Not all of them are supported at the moment, we welcome you to contribute support for them
-and send a pull request also via our [issue tracker][https://github.com/csyezheng/edx-helper/issues].
+and send a pull request also via our [issue tracker](https://github.com/csyezheng/edx-helper/issues).
 
 ## Disclaimer
 
