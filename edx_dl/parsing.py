@@ -3,6 +3,7 @@
 """
 Parsing and extraction functions
 """
+import sys
 import re
 import json
 
@@ -13,6 +14,12 @@ from bs4 import BeautifulSoup as BeautifulSoup_
 
 from .common import Course, Section, SubSection, Block, Unit, WebpageUnit, Video
 
+
+if sys.version_info[:2] >= (3, 4):
+    import html
+else:
+    from six.moves import html_parser
+    html = html_parser.HTMLParser()
 
 # Force use of bs4 with html.parser
 BeautifulSoup = lambda page: BeautifulSoup_(page, 'html.parser')
@@ -402,8 +409,8 @@ class CurrentEdXPageExtractor(ClassicEdXPageExtractor):
         videos = []
         match_metadatas = re_metadata.findall(text)
         for match_metadata in match_metadatas:
-            metadata = html_parser.HTMLParser().unescape(match_metadata)
-            metadata = json.loads(html_parser.HTMLParser().unescape(metadata))
+            metadata = html.unescape(match_metadata)
+            metadata = json.loads(html.unescape(metadata))
             video_youtube_url = None
             re_video_speed = re.compile(r'1.0\d+\:(?:.*?)(.{11})')
             match_video_youtube_url = re_video_speed.search(metadata['streams'])
@@ -567,8 +574,8 @@ class RobustEdXPageExtractor(NewEdXPageExtractor):
                     re_metadata = re.compile(r'data-metadata=&#39;(.*?)&#39;')
                     match_metadatas = re_metadata.findall(str(unit_soup))
                     for match_metadata in match_metadatas:
-                        metadata = html_parser.HTMLParser().unescape(match_metadata)
-                        metadata = json.loads(html_parser.HTMLParser().unescape(metadata))
+                        metadata = html.unescape(match_metadata)
+                        metadata = json.loads(html.unescape(metadata))
                         re_video_speed = re.compile(r'1.0\d+\:(?:.*?)(.{11})')
                         match_video_youtube_url = re_video_speed.search(metadata['streams'])
                         if match_video_youtube_url is not None:
