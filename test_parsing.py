@@ -7,9 +7,9 @@ import json
 
 import pytest
 
-from edx_dl.common import DEFAULT_FILE_FORMATS
+from edx_helper.common import DEFAULT_FILE_FORMATS
 
-from edx_dl.parsing import (
+from edx_helper.parsing import (
     edx_json2srt,
     ClassicEdXPageExtractor,
     CurrentEdXPageExtractor,
@@ -56,8 +56,10 @@ def test_extract_units_from_html_single_unit_multiple_subs():
                                                                   DEFAULT_FILE_FORMATS)
 
         assert units[0].videos[0].video_youtube_url == 'https://youtube.com/watch?v=b7xgknqkQk8'
-        assert units[0].videos[0].mp4_urls[0] == 'https://d2f1egay8yehza.cloudfront.net/edx-edx101/EDXSPCPJSP13-H010000_100.mp4'
-        assert units[0].videos[0].sub_template_url == 'https://courses.edx.org/courses/edX/DemoX.1/2014/xblock/i4x:;_;_edX;_DemoX.1;_video;_14459340170c476bb65f73a0a08a076f/handler/transcript/translation/%s'
+        assert units[0].videos[0].mp4_urls[
+                   0] == 'https://d2f1egay8yehza.cloudfront.net/edx-edx101/EDXSPCPJSP13-H010000_100.mp4'
+        assert units[0].videos[
+                   0].sub_template_url == 'https://courses.edx.org/courses/edX/DemoX.1/2014/xblock/i4x:;_;_edX;_DemoX.1;_video;_14459340170c476bb65f73a0a08a076f/handler/transcript/translation/%s'
 
 
 def test_extract_multiple_units_multiple_resources():
@@ -71,7 +73,8 @@ def test_extract_multiple_units_multiple_resources():
         assert 'https://youtube.com/watch?v=CJ482b9r_0g' in [video.video_youtube_url for video in units[0].videos]
         assert len(units[0].videos[0].mp4_urls) > 0
         assert 'https://s3.amazonaws.com/berkeley-cs184x/videos/overview-motivation.mp4' in units[0].videos[0].mp4_urls
-        assert 'https://courses.edx.org/static/content-berkeley-cs184x~2012_Fall/slides/overview.pdf' in units[0].resources_urls
+        assert 'https://courses.edx.org/static/content-berkeley-cs184x~2012_Fall/slides/overview.pdf' in units[
+            0].resources_urls
 
 
 def test_extract_multiple_units_no_youtube_ids():
@@ -128,7 +131,7 @@ def test_extract_courses_from_html(filename, site, num_courses_expected, num_ava
     with open(filename, "r", encoding='UTF-8') as f:
         courses = CurrentEdXPageExtractor().extract_courses_from_html(f.read(), site)
         assert len(courses) == num_courses_expected
-        available_courses = [course for course in courses if course.state == 'Started']
+        available_courses = [course for course in courses if course.course_state == 'Started']
         assert len(available_courses) == num_available_courses_expected
 
 

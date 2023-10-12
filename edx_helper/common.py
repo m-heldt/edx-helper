@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Common type definitions and constants for edx-dl
+Common type definitions and constants for edx-helper
 
 The classes in this module represent the structure of courses in edX.  The
 structure is:
@@ -23,7 +23,7 @@ In the script the data structures used are:
 2. The data structures to represent the chosen courses and sections:
    selections = {Course, [Section]}
 
-3. The data structure of all the downloable resources which represent each
+3. The data structure of all the downloadable resources which represent each
    subsection via its URL and the of resources who can be extracted from the
    Units it contains:
    all_units = {Subsection.url: [Unit]}
@@ -37,38 +37,40 @@ class Course(object):
     """
     Course class represents course information.
     """
-    def __init__(self, id, name, url, state):
+
+    def __init__(self, course_id, course_name, course_url, course_state):
         """
-        @param id: The id of a course in edX is composed by the path
+        @param course_id: The id of a course in edX is composed by the path
             {organization}/{course_number}/{course_run}
-        @type id: str or None
+        @type course_id: str or None
 
-        @param name: Name of the course. The name is taken from course page
+        @param course_name: Name of the course. The name is taken from course page
             h3 header.
-        @type name: str
+        @type course_name: str
 
-        @param url: URL of the course.
-        @type url: str or None
+        @param course_url: URL of the course.
+        @type course_url: str or None
 
-        @param state: State of the course. One of the following values:
+        @param course_state: State of the course. One of the following values:
             * 'Not yet'
             * 'Started'
-        @type state: str
+        @type course_state: str
         """
-        self.id = id
-        self.name = name
-        self.url = url
-        self.state = state
+        self.course_id = course_id
+        self.course_name = course_name
+        self.course_url = course_url
+        self.course_state = course_state
 
     def __repr__(self):
-        url = self.url if self.url else "None"
-        return self.name + ": " + url
+        url = self.course_url if self.course_url else "None"
+        return self.course_name + ": " + url
 
 
 class Section(object):
     """
     Representation of a section of the course.
     """
+
     def __init__(self, position, name, url, subsections):
         """
         @param position: Integer position of the section in the list of
@@ -95,6 +97,7 @@ class SubSection(object):
     """
     Representation of a subsection in a section.
     """
+
     def __init__(self, position, name, url):
         """
         @param position: Integer position of the subsection in the subsection
@@ -119,6 +122,7 @@ class Block(object):
     """
     Representation of a block of the course.
     """
+
     def __init__(self, position, block_id, name, block_type, url, children):
         """
         @param position: Integer position of the block in the list of blocks. Starts at 1.
@@ -149,6 +153,7 @@ class Unit(object):
     """
     Representation of a single unit of the course.
     """
+
     def __init__(self, videos, resources_urls):
         """
         @param videos: List of videos present in the unit.
@@ -156,7 +161,7 @@ class Unit(object):
 
         @param resources_urls: List of additional resources that are come along
             with the unit. Resources include files with certain extensions
-            and youtube links.
+            and YouTube links.
         @type resources_urls: [str]
         """
         self.videos = videos
@@ -168,6 +173,7 @@ class WebpageUnit(Unit):
     Representation of a Webpage for unit in the course.
     Used for unit type: discussion, html, problem, etc, not video unit
     """
+
     def __init__(self, page_title, content):
         """
         """
@@ -180,6 +186,7 @@ class Video(object):
     """
     Representation of a single video.
     """
+
     def __init__(self, video_youtube_url, available_subs_url,
                  sub_template_url, mp4_urls):
         """
@@ -215,7 +222,7 @@ class ExitCode(object):
 
 
 YOUTUBE_DL_CMD = ['youtube-dl', '--ignore-config']
-DEFAULT_CACHE_FILENAME = 'edx-dl.cache'
+DEFAULT_CACHE_FILENAME = 'cached_units.cache'
 DEFAULT_FILE_FORMATS = ['e?ps', 'pdf', 'txt', 'doc', 'xls', 'ppt',
                         'docx', 'xlsx', 'pptx', 'odt', 'ods', 'odp', 'odg',
                         'zip', 'rar', 'gz', 'mp3', 'R', 'Rmd', 'ipynb', 'py']

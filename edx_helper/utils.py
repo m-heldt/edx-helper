@@ -15,11 +15,11 @@ import warnings
 import functools
 from tqdm.auto import tqdm
 
-
 if sys.version_info[:2] >= (3, 4):
     import html
 else:
     from six.moves import html_parser
+
     html = html_parser.HTMLParser()
 
 
@@ -47,7 +47,7 @@ def execute_command(cmd, args):
         subprocess.check_call(cmd)
     except subprocess.CalledProcessError as e:
         if args.ignore_errors:
-            logging.warn('External command error ignored: %s', e)
+            logging.warning('External command error ignored: %s', e)
         else:
             raise e
 
@@ -155,6 +155,7 @@ def deprecated(func):
     This is a decorator which can be used to mark functions as deprecated.
     It will result in a warning being emitted when the function is used.
     """
+
     @functools.wraps(func)
     def new_func(*args, **kwargs):
         warnings.simplefilter('always', DeprecationWarning)  # turn off filter
@@ -163,6 +164,7 @@ def deprecated(func):
                       stacklevel=2)
         warnings.simplefilter('default', DeprecationWarning)  # reset filter
         return func(*args, **kwargs)
+
     return new_func
 
 

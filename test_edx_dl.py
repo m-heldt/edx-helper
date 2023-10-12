@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-from edx_dl import edx_dl, parsing
-from edx_dl.common import Unit, Video, DEFAULT_FILE_FORMATS
+from edx_helper import edx_dl, parsing
+from edx_helper.common import Unit, Video, DEFAULT_FILE_FORMATS
 
 
 def test_failed_login():
@@ -102,7 +102,7 @@ def test_edx_get_subtitle():
     def mock_get_page_contents_as_json(u, h):
         assert u == url
         assert h == headers
-        return { 'start' : [123], 'end' : [456], 'text' : ["subtitle content"] }
+        return {'start': [123], 'end': [456], 'text': ["subtitle content"]}
 
     url = "https://lagunita.stanford.edu/courses/Engineering/QMSE02./Winter2016/xblock/i4x:;_;_Engineering;_QMSE02.;_video;_7f4f16e3eb294538aa8db4c43877132b/handler/transcript/download"
     headers = {}
@@ -145,7 +145,8 @@ def test_extract_subtitle_urls():
     """
 
     page_extractor = parsing.CurrentEdXPageExtractor()
-    expected = (None, 'https://base.url/courses/Engineering/QMSE02./Winter2016/xblock/i4x:;_;_Engineering;_QMSE02.;_video;_1a4c7ff41e484a15927987b745a5c779/handler/transcript/download')
+    expected = (None,
+                'https://base.url/courses/Engineering/QMSE02./Winter2016/xblock/i4x:;_;_Engineering;_QMSE02.;_video;_1a4c7ff41e484a15927987b745a5c779/handler/transcript/download')
     actual = page_extractor.extract_subtitle_urls(text, "https://base.url")
     print("actual", actual)
     assert expected == actual

@@ -9,11 +9,9 @@ import json
 
 from datetime import timedelta, datetime
 
-from six.moves import html_parser
 from bs4 import BeautifulSoup as BeautifulSoup_
 
 from .common import Course, Section, SubSection, Block, Unit, WebpageUnit, Video
-
 
 if sys.version_info[:2] >= (3, 4):
     import html
@@ -57,13 +55,6 @@ class JsonExtractor(object):
     Base class for JsonExtractor
     Every subclass can represent a different data structures from API of an OpenEdX site.
     They should implement the given methods.
-
-    Usage:
-
-      >>> from edx_dl import parsing
-      >>> extractor = parsing.SubclassFromJsonExtractor()
-      >>> courses = extractor.extract_courses(response)
-      >>> ...
     """
 
     def extract_courses(self, deserialized_response):
@@ -78,7 +69,7 @@ class JsonExtractor(object):
         """
         raise NotImplementedError("Subclasses should implement this")
 
-    def extract_vertical_blocks(self, deserialized_response):
+    def extract_vertical_blocks(self, deserialized_response, url):
         """
         Method to extract the vertical blocks from deserialized response
         """
@@ -107,10 +98,10 @@ class EdXJsonExtractor(JsonExtractor):
                 course_state = 'Started'
             else:
                 course_state = 'Not yet'
-            courses.append(Course(id=course_id,
-                                  name=course_name,
-                                  url=course_url,
-                                  state=course_state))
+            courses.append(Course(course_id=course_id,
+                                  course_name=course_name,
+                                  course_url=course_url,
+                                  course_state=course_state))
         return courses
 
     def extract_sequential_blocks(self, response):
@@ -172,13 +163,6 @@ class PageExtractor(object):
     Base class for PageExtractor
     Every subclass can represent a different layout for an OpenEdX site.
     They should implement the given methods.
-
-    Usage:
-
-      >>> from edx_dl import parsing
-      >>> d = parsing.SubclassFromPageExtractor()
-      >>> units = d.extract_units_from_html(page, BASE_URL)
-      >>> ...
     """
 
     def extract_units_from_html(self, page, BASE_URL, file_formats):
@@ -392,10 +376,10 @@ class ClassicEdXPageExtractor(PageExtractor):
                 course_id = course_soup.a['href'][9:-5]
             except KeyError:
                 pass
-            courses.append(Course(id=course_id,
-                                  name=course_name,
-                                  url=course_url,
-                                  state=course_state))
+            courses.append(Course(course_id=course_id,
+                                  course_name=course_name,
+                                  course_url=course_url,
+                                  course_state=course_state))
 
         return courses
 

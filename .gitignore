@@ -22,4 +22,4 @@ __pycache__/
 .cache/
 
 # Application files
-edx-dl.cache
+edx-helper.cache

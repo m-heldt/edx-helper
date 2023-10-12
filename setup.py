@@ -7,27 +7,20 @@
 
 from __future__ import print_function
 
-import os.path
-import subprocess
-import sys
-
 from setuptools import setup
 
-from edx_dl._version import __version__
+from edx_helper import __version__
 
 
 def read_file(filename, alt=None):
     """
     Read the contents of filename or give an alternative result instead.
     """
-    lines = None
-
     try:
-        with open(filename) as f:
-            lines = f.read()
+        with open(filename, encoding='utf-8') as f:
+            return f.read()
     except IOError:
-        lines = [] if alt is None else alt
-    return lines
+        return [] if alt is None else alt
 
 
 long_description = read_file(
@@ -56,13 +49,13 @@ trove_classifiers = [
 ]
 
 setup(
-    name='edx-dl',
+    name='edx-helper',
     version=__version__,
-    maintainer='Ismaël Mejía, Rogério Theodoro de Brito, Yuri Bochkarev',
-    maintainer_email='iemejia@gmail.com, rbrito@ime.usp.br, baltazar.bz@gmail.com',
+    maintainer='Ye Zheng',
+    maintainer_email='csyezheng@gmail.com',
 
     license='LGPL',
-    url='https://github.com/coursera-dl/edx-dl',
+    url='https://github.com/csyezheng/edx-helper',
 
     install_requires=requirements,
     extras_require={
@@ -72,13 +65,13 @@ setup(
     description='Simple tool to download video and lecture materials from edx.org.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    keywords=['edx-dl','edX', 'download', 'education', 'MOOCs', 'video'],
+    keywords=['edx-helper', 'edx-dl', 'edX', 'download', 'education', 'MOOCs', 'video'],
     classifiers=trove_classifiers,
 
-    packages=["edx_dl"],
+    packages=["edx_helper"],
     entry_points=dict(
         console_scripts=[
-            'edx-dl=edx_dl.edx_dl:main'
+            'edx-helper=edx_helper.edx_dl:main'
         ]
     ),
 

@@ -1,6 +1,4 @@
-FROM python:3.4-slim
-
-LABEL maintainer "opsxcq@strm.sh"
+FROM python:3.9-slim
 
 WORKDIR /src
 COPY requirements.txt /src
@@ -14,5 +12,5 @@ RUN python setup.py install
 
 WORKDIR /
 VOLUME /Downloaded
-ENTRYPOINT ["edx-dl"]
+ENTRYPOINT ["edx-helper"]
 CMD ["--help"]

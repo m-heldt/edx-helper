@@ -8,7 +8,7 @@ import subprocess
 import pytest
 import six
 
-from edx_dl import utils
+from edx_helper import utils
 
 
 def test_clean_filename():
@@ -17,11 +17,11 @@ def test_clean_filename():
         '(:': '-',
         'a téest &and a@noòtheèr': 'a_test_and_another',
         'Lecture 2.7 - Evaluation and Operators (16:25)':
-        'Lecture_2.7_-_Evaluation_and_Operators_16-25',
+            'Lecture_2.7_-_Evaluation_and_Operators_16-25',
         'Week 3: Data and Abstraction':
-        'Week_3-_Data_and_Abstraction',
+            'Week_3-_Data_and_Abstraction',
         '  (Week 1) BRANDING:  Marketing Strategy and Brand Positioning':
-        'Week_1_BRANDING-__Marketing_Strategy_and_Brand_Positioning',
+            'Week_1_BRANDING-__Marketing_Strategy_and_Brand_Positioning',
         'test &amp; &quot; adfas': 'test___adfas',
         '&nbsp;': ''
     }
@@ -36,11 +36,11 @@ def test_clean_filename_minimal_change():
         '(:': '(-',
         'a téest &and a@noòtheèr': 'a téest &and a@noòtheèr',
         'Lecture 2.7 - Evaluation and Operators (16:25)':
-        'Lecture 2.7 - Evaluation and Operators (16-25)',
+            'Lecture 2.7 - Evaluation and Operators (16-25)',
         'Week 3: Data and Abstraction':
-        'Week 3- Data and Abstraction',
+            'Week 3- Data and Abstraction',
         '  (Week 1) BRANDING:  Marketing Strategy and Brand Positioning':
-        '  (Week 1) BRANDING-  Marketing Strategy and Brand Positioning',
+            '  (Week 1) BRANDING-  Marketing Strategy and Brand Positioning',
         'test &amp; &quot; adfas': 'test & " adfas',
         '&nbsp;': u'\xa0'
     }
@@ -155,7 +155,6 @@ def test_remove_duplicates_with_seen():
         (['a'], {'a', 'b'}, [], {'a', 'b'}),
 
         (['a'], {'a', 'b', tuple()}, [], {'a', 'b', tuple()}),
-
 
         # (['a', 'a'], ['a'], {'a'}),
         # (['a', 'b'], ['a', 'b'], {'a', 'b'}),

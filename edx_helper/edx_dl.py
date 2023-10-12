@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Main module for the edx-dl downloader.
+Main module for the edx-helper.
 It corresponds to the cli interface
 """
 
@@ -33,7 +33,7 @@ from six.moves.urllib.request import (
 
 import requests
 
-from ._version import __version__
+from edx_helper import __version__
 
 from .common import (
     YOUTUBE_DL_CMD,
@@ -55,7 +55,6 @@ from .utils import (
     clean_filename,
     directory_name,
     execute_command,
-    get_filename_from_prefix,
     get_page_contents,
     get_page_contents_as_json,
     mkdir_p,
@@ -63,7 +62,6 @@ from .utils import (
     deprecated,
     TqdmUpTo,
 )
-
 
 OPENEDX_SITES = {
     'edx': {
@@ -98,8 +96,8 @@ OPENEDX_SITES = {
         'url': 'https://mitxpro.mit.edu',
         'courseware-selector': ('nav', {'aria-label': 'Course Navigation'}),
     },
-    'bits':{
-        'url':'http://any-learn.bits-pilani.ac.in',
+    'bits': {
+        'url': 'http://any-learn.bits-pilani.ac.in',
         'courseware-selector': ('nav', {'aria-label': 'Course Navigation'}),
     }
 }
@@ -145,7 +143,7 @@ def _display_courses(courses):
     logging.info('You can access %d courses', len(courses))
 
     for i, course in enumerate(courses, 1):
-        logging.info('%2d - %s [%s]', i, course.name, course.id)
+        logging.info('%2d - %s [%s]', i, course.course_name, course.course_id)
         logging.info('     %s', course.url)
 
 
@@ -185,7 +183,7 @@ def _get_initial_token(url):
             logging.info('Found CSRF token.')
             return cookie.value
 
-    logging.warn('Did not find the CSRF token.')
+    logging.warning('Did not find the CSRF token.')
     return ''
 
 
@@ -218,23 +216,23 @@ def get_available_sequential_blocks(course_id, headers):
 
 
 def edx_get_subtitle(url, headers,
-                     get_page_contents=get_page_contents,
-                     get_page_contents_as_json=get_page_contents_as_json):
+                     get_html=get_page_contents,
+                     get_json=get_page_contents_as_json):
     """
     Return a string with the subtitles content from the url or None if no
     subtitles are available.
     """
     try:
         if ';' in url:  # non-JSON format (e.g. Stanford)
-            return get_page_contents(url, headers)
+            return get_html(url, headers)
         else:
-            json_object = get_page_contents_as_json(url, headers)
+            json_object = get_json(url, headers)
             return edx_json2srt(json_object)
     except URLError as exception:
-        logging.warn('edX subtitles (error: %s)', exception)
+        logging.warning('edX subtitles (error: %s)', exception)
         return None
     except ValueError as exception:
-        logging.warn('edX subtitles (error: %s)', exception.message)
+        logging.warning('edX subtitles (error: %s)', exception)
         return None
 
 
@@ -264,17 +262,17 @@ def parse_args():
     """
     Parse the arguments/options passed to the program on the command line.
     """
-    parser = argparse.ArgumentParser(prog='edx-dl',
+    parser = argparse.ArgumentParser(prog='edx-helper',
                                      description='Get videos from the OpenEdX platform',
                                      epilog='For further use information,'
-                                     'see the file README.md',)
+                                            'see the file README.md', )
     # positional
     parser.add_argument('course_urls',
                         nargs='*',
                         action='store',
                         default=[],
                         help='target course urls '
-                        '(e.g., https://courses.edx.org/courses/BerkeleyX/CS191x/2013_Spring/info)')
+                             '(e.g., https://courses.edx.org/courses/BerkeleyX/CS191x/2013_Spring/info)')
 
     # optional
     parser.add_argument('-u',
@@ -287,7 +285,7 @@ def parse_args():
                         '--password',
                         action='store',
                         help='your edX password, '
-                        'beware: it might be visible to other users on your system')
+                             'beware: it might be visible to other users on your system')
 
     parser.add_argument('-f',
                         '--format',
@@ -359,16 +357,16 @@ def parse_args():
                         dest='export_filename',
                         default=None,
                         help='filename where to put an exported list of urls. '
-                        'Use dash "-" to output to stdout. '
-                        'Download will not be performed if this option is '
-                        'present')
+                             'Use dash "-" to output to stdout. '
+                             'Download will not be performed if this option is '
+                             'present')
 
     parser.add_argument('--export-format',
                         dest='export_format',
                         default='%(url)s',
                         help='export format string. Old-style python formatting '
-                        'is used. Available variables: %%(url)s. Default: '
-                        '"%%(url)s"')
+                             'is used. Available variables: %%(url)s. Default: '
+                             '"%%(url)s"')
 
     parser.add_argument('--list-file-formats',
                         dest='list_file_formats',
@@ -381,14 +379,14 @@ def parse_args():
                         action='store',
                         default=None,
                         help='appends file formats to be extracted (comma '
-                        'separated)')
+                             'separated)')
 
     parser.add_argument('--overwrite-file-formats',
                         dest='overwrite_file_formats',
                         action='store_true',
                         default=False,
                         help='if active overwrites the file formats to be '
-                        'extracted')
+                             'extracted')
 
     parser.add_argument('--cache',
                         dest='cache',
@@ -426,7 +424,6 @@ def parse_args():
                         help='display version and exit')
 
     args = parser.parse_args()
-
 
     # Initialize the logging system first so that other functions
     # can use it right away.
@@ -480,7 +477,8 @@ def extract_units_from_vertical_block(vertical_block, headers, file_formats):
     """
     Parses a webpage and extracts its resources e.g. video_url, sub_url, etc.
     """
-    vertical_block_api = COURSE_XBLOCK_API + '/' + vertical_block.block_id + '?show_title=0&show_bookmark_button=0&recheck_access=1&view=student_view'
+    vertical_block_api = COURSE_XBLOCK_API + '/' + vertical_block.block_id + '?show_title=0&show_bookmark_button=0' \
+                                                                             '&recheck_access=1&view=student_view'
     logging.debug("Extracting units from: \n'%s'", vertical_block_api)
 
     page_title = vertical_block.name
@@ -577,7 +575,7 @@ def _display_sections_menu(course, sections):
     """
     num_sections = len(sections)
 
-    logging.info('%s [%s] has %d sections so far', course.name, course.id, num_sections)
+    logging.info('%s [%s] has %d sections so far', course.course_name, course.course_id, num_sections)
     for i, section in enumerate(sections, 1):
         logging.info('%2d - Download %s videos', i, section.name)
 
@@ -597,13 +595,13 @@ def _filter_sections(index, sections):
     if index is not None:
         try:
             index = int(index)
-            if index > 0 and index <= num_sections:
+            if 0 < index <= num_sections:
                 logging.info('Sections filtered to: %d', index)
                 return [sections[index - 1]]
             else:
                 pass  # log some info here
         except ValueError:
-            pass   # log some info here
+            pass  # log some info here
     else:
         pass  # log some info here
 
@@ -649,7 +647,7 @@ def parse_courses(args, available_courses):
     selected_courses = [available_course
                         for available_course in available_courses
                         for url in args.course_urls
-                        if available_course.url == url]
+                        if available_course.course_url == url]
     if len(selected_courses) == 0:
         logging.error('You have not passed a valid course url, check the correct url with --list-courses')
         exit(ExitCode.INVALID_COURSE_URL)
@@ -669,8 +667,7 @@ def parse_sections(args, selections):
     if not args.filter_section:
         return selections
 
-    filtered_selections = {selected_course:
-                           _filter_sections(args.filter_section, selected_sections)
+    filtered_selections = {selected_course: _filter_sections(args.filter_section, selected_sections)
                            for selected_course, selected_sections in selections.items()}
     return filtered_selections
 
@@ -702,7 +699,7 @@ def _display_selections(selections):
     """
     for selected_course, selected_sections in selections.items():
         logging.info('Downloading %s [%s]',
-                     selected_course.name, selected_course.id)
+                     selected_course.course_name, selected_course.course_id)
         _display_sections(selected_sections)
 
 
@@ -712,7 +709,7 @@ def _display_selection_blocks(selections):
     """
     for selected_course, selected_blocks in selections.items():
         logging.info('Downloading %s [%s]',
-                     selected_course.name, selected_course.id)
+                     selected_course.course_name, selected_course.course_id)
         _display_blocks(selected_blocks)
 
 
@@ -722,70 +719,11 @@ def parse_units(all_units):
     """
     flat_units = [unit for units in all_units.values() for unit in units]
     if len(flat_units) < 1:
-        logging.warn('No downloadable video found.')
+        logging.warning('No downloadable video found.')
         exit(ExitCode.NO_DOWNLOADABLE_VIDEO)
 
 
-def get_subtitles_urls(available_subs_url, sub_template_url, headers):
-    """
-    Request the available subs and builds the urls to download subs
-    """
-    if available_subs_url is not None and sub_template_url is not None:
-        try:
-            available_subs = get_page_contents_as_json(available_subs_url,
-                                                       headers)
-        except HTTPError:
-            available_subs = ['en']
-
-        return {sub_lang: sub_template_url % sub_lang
-                for sub_lang in available_subs}
-
-    elif sub_template_url is not None:
-        try:
-            available_subs = get_page_contents(sub_template_url,
-                                                       headers)
-        except HTTPError:
-            available_subs = ['en']
-
-        return {'en': sub_template_url}
-
-    return {}
-
-
-def _build_subtitles_downloads(video, target_dir, filename_prefix, headers):
-    """
-    Builds a dict {url: filename} for the subtitles, based on the
-    filename_prefix of the video
-    """
-    downloads = {}
-    filename = get_filename_from_prefix(target_dir, filename_prefix)
-
-    if filename is None:
-        logging.warn('No video downloaded for %s', filename_prefix)
-        return downloads
-    if video.sub_template_url is None:
-        logging.warn('No subtitles downloaded for %s', filename_prefix)
-        return downloads
-
-    # This is a fix for the case of retrials because the extension would be
-    # .lang (from .lang.srt), so the matching does not detect correctly the
-    # subtitles name
-    re_is_subtitle = re.compile(r'(.*)(?:\.[a-z]{2})')
-    match_subtitle = re_is_subtitle.match(filename)
-    if match_subtitle:
-        filename = match_subtitle.group(1)
-
-    subtitles_download_urls = get_subtitles_urls(video.available_subs_url,
-                                                 video.sub_template_url,
-                                                 headers)
-    for sub_lang, sub_url in subtitles_download_urls.items():
-        subs_filename = os.path.join(target_dir,
-                                     filename + '.' + sub_lang + '.srt')
-        downloads[sub_url] = subs_filename
-    return downloads
-
-
-def _subtitles_info(video, target_dir, filename_prefix, headers):
+def _subtitles_info(video, target_dir):
     """
     Builds a dict {url: filename} for the subtitles, based on the
     filename_prefix of the video
@@ -810,9 +748,7 @@ def _build_url_downloads(urls, target_dir, filename_prefix):
     If it is a youtube url it uses the valid template for youtube-dl
     otherwise just takes the name of the file from the url
     """
-    downloads = {url:
-                 _build_filename_from_url(url, target_dir, filename_prefix)
-                 for url in urls}
+    downloads = {url: _build_filename_from_url(url, target_dir, filename_prefix) for url in urls}
     return downloads
 
 
@@ -839,9 +775,8 @@ def download_url(url, filename, headers, args):
     if is_youtube_url(url) and args.prefer_cdn_videos:
         pass
     elif is_youtube_url(url):
-        download_youtube_url(url, filename, headers, args)
+        download_youtube_url(url, filename, args)
     else:
-        import ssl
         import requests
         from tqdm.auto import tqdm
         # FIXME: Ugly hack for coping with broken SSL sites:
@@ -873,16 +808,16 @@ def download_url(url, filename, headers, args):
                         for chunk in response.iter_content(chunk_size=4096):
                             fdw.write(chunk)
         except Exception as e:
-            logging.warn('Got SSL/Connection error: %s', e)
+            logging.warning('Got SSL/Connection error: %s', e)
             if not args.ignore_errors:
-                logging.warn('Hint: if you want to ignore this error, add '
-                             '--ignore-errors option to the command line')
+                logging.warning('Hint: if you want to ignore this error, add '
+                                '--ignore-errors option to the command line')
                 raise e
             else:
-                logging.warn('SSL/Connection error ignored: %s', e)
+                logging.warning('SSL/Connection error ignored: %s', e)
 
 
-def download_youtube_url(url, filename, headers, args):
+def download_youtube_url(url, filename, args):
     """
     Downloads a youtube URL and applies the filters from args
     """
@@ -898,7 +833,7 @@ def download_youtube_url(url, filename, headers, args):
     execute_command(cmd, args)
 
 
-def download_subtitle(url, filename, headers, args):
+def download_subtitle(url, filename, headers):
     """
     Downloads the subtitle from the url and transforms it to the srt format
     """
@@ -909,7 +844,7 @@ def download_subtitle(url, filename, headers, args):
             f.write(subs_string.encode('utf-8'))
 
 
-def download_subtitle_without_name(url, target_dir, filename, headers, args):
+def download_subtitle_without_name(url, target_dir, filename, headers):
     """
     Downloads the subtitle from the url
     """
@@ -923,8 +858,8 @@ def download_subtitle_without_name(url, target_dir, filename, headers, args):
             logging.warning('Not setting file name for: %s', url)
             return
     file_path = os.path.join(target_dir, filename)
-    with open(file_path, 'wb') as f:
-        f.write(response)
+    with open(file_path, 'wb', encoding='utf-8') as f:
+        f.write(response.content)
 
 
 def skip_or_download(downloads, headers, args, f=download_url):
@@ -968,11 +903,10 @@ def download_video(video, args, target_dir, filename_prefix, headers):
     # the destination name until the video is downloaded with youtube-dl
     # also, subtitles must be transformed from the raw data to the srt format
     if args.subtitles:
-        sub_downloads = _subtitles_info(video, target_dir,
-                                        filename_prefix, headers)
+        sub_downloads = _subtitles_info(video, target_dir)
         logging.info(sub_downloads)
         for url, filename in sub_downloads.items():
-            download_subtitle_without_name(url, target_dir, filename, headers, args)
+            download_subtitle_without_name(url, target_dir, filename, headers)
 
 
 def download_unit(unit, args, target_dir, filename_prefix, headers):
@@ -1006,7 +940,7 @@ def download(args, selections, all_units, headers):
 
     executor = futures.ThreadPoolExecutor()
     for selected_course, selected_blocks in selections.items():
-        course_name = directory_name(selected_course.name)
+        course_name = directory_name(selected_course.course_name)
         for selected_block in selected_blocks:
             section_dir = "%02d-%s" % (selected_block.position, selected_block.name)
             section_path = os.path.join(args.output_dir, course_name, clean_filename(section_dir))
@@ -1026,7 +960,6 @@ def download(args, selections, all_units, headers):
                     else:
                         executor.submit(download_unit, unit, args, seq_path, filename_prefix, headers)
     executor.shutdown(wait=True)
-
 
 
 def remove_repeated_urls(all_units):
@@ -1115,8 +1048,8 @@ def extract_all_units_with_cache(all_urls, headers, file_formats,
 
 
 def extract_units_with_cache(sequential_block_list, headers, file_formats,
-                                 filename=DEFAULT_CACHE_FILENAME,
-                                 extractor=extract_units_in_parallel):
+                             filename=DEFAULT_CACHE_FILENAME,
+                             extractor=extract_units_in_parallel):
     """
     Extracts the units which are not in the cache and extract their resources
     returns the full list of units (cached+new)
@@ -1193,12 +1126,12 @@ def main():
     Main program function
     """
     args = parse_args()
-    logging.info('edx_dl version %s', __version__)
+    logging.info('edx_helper version %s', __version__)
     file_formats = parse_file_formats(args)
 
     change_openedx_site(args.platform)
 
-    # Query password, if not alredy passed by command line.
+    # Query password, if not already passed by command line.
     if not args.password:
         args.password = getpass.getpass(stream=sys.stderr)
 
@@ -1217,18 +1150,17 @@ def main():
 
     # Parse and select the available courses
     courses = get_courses_info(COURSE_LIST_API, headers)
-    available_courses = [course for course in courses if course.state == 'Started']
+    available_courses = [course for course in courses if course.course_state == 'Started']
     selected_courses = parse_courses(args, available_courses)
 
     # Parse the sections and build the selections dict filtered by sections
     if args.platform == 'edx':
-        all_chapter_blocks = {selected_course: get_available_sequential_blocks(selected_course.id, headers)
-                          for selected_course in selected_courses}
+        all_chapter_blocks = {selected_course: get_available_sequential_blocks(selected_course.course_id, headers)
+                              for selected_course in selected_courses}
     else:
-        all_chapter_blocks = {selected_course:
-                          get_available_sections(selected_course.url.replace('info', 'courseware'),
-                                                 headers)
-                          for selected_course in selected_courses}
+        all_chapter_blocks = {
+            selected_course: get_available_sections(selected_course.url.replace('info', 'courseware'), headers)
+            for selected_course in selected_courses}
 
     # selections = all_chapter_blocks
     selections = parse_sections(args, all_chapter_blocks)
@@ -1265,7 +1197,7 @@ def main():
     # filtered_units = remove_repeated_urls(all_units)
     # num_all_urls = num_urls_in_units_dict(all_units)
     # num_filtered_urls = num_urls_in_units_dict(filtered_units)
-    # logging.warn('Removed %d duplicated urls from %d in total',
+    # logging.warning('Removed %d duplicated urls from %d in total',
     #              (num_all_urls - num_filtered_urls), num_all_urls)
 
     # finally we download or export all the resources
@@ -1281,5 +1213,5 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        logging.warn("\n\nCTRL-C detected, shutting down....")
+        logging.warning("\n\nCTRL-C detected, shutting down....")
         sys.exit(ExitCode.OK)
