@@ -16,7 +16,9 @@
     + [Docker container](#docker-container)
     + [Optional: update youtube-dl](#optional-update-youtube-dl)
   * [Quick Start](#quick-start)
-    + [Examples](#examples)
+    + [List courses](#list-courses)
+    + [Download course](#download-course)
+    + [More download options](#more-download-options)
   * [Troubleshooting](#troubleshooting)
     + [china-issues](#china-issues)
   * [Reporting issues](#reporting-issues)
@@ -38,20 +40,24 @@ It is platform independent, and should work fine under Unix (Linux, BSDs etc.), 
 
 `edx-helper` requires Python 3 and very few other dependencies. (As of October 2023, `edx-helper` passed the test of Python versions 3.7, 3.8, 3.9, 3.10, and 3.11).
 
-**Note:** We *strongly* recommend that you use a Python 3 interpreter (3.9
-or later).
-
 ### Installation (recommended)
 
 Opening a terminal and typing the command If you have installed Python:
 
-    python -m pip install edx-helper
+    pip install edx-helper
 
 ### Manual Installation
 
-To install all the dependencies please do:
+    pip install git+https://github.com/csyezheng/edx-helper.git
 
-    pip install -r requirements.txt
+or
+
+```
+git clone https://github.com/csyezheng/edx-helper.git
+cd edx-helper
+pip install -r requirements.txt
+python setup.py install
+```
 
 ### Docker container
 
@@ -59,9 +65,12 @@ You can run this application via [Docker](https://docker.com) if you want. Just 
 
 ```
 docker run --rm -it \
-       -v "$(pwd)/edx/:/Downloaded" \
-       strm/edx-helper -u <USER> -p <PASSWORD>
+       -v "$(pwd):/Downloaded" \
+       csyezheng/edx-helper -u <USER> -p <PASSWORD> COURSE_URL
 ```
+
+* Please note that it will prompt that unable to find the image locally, please wait patiently for downloading.
+* The course files will be downloaded to your current directory.
 
 ### Optional: update youtube-dl
 
@@ -84,9 +93,13 @@ Run the following command to query the usage and options:
 edx-helper --help
 ```
 
+### List courses
+
 Run the following command to query the courses in which you are enrolled:
 
     edx-helper -u <email or username> --list-courses
+
+### Download course
 
 From there, choose the course you are interested in, copy its URL and use it
 in the following command:
@@ -97,6 +110,38 @@ Your downloaded videos will be placed in a new directory called
 `Downloaded`, inside your current directory, but you can also choose another
 destination with the `-o` argument.
 
+### More download options
+
+Normal download:
+
+```
+edx-helper -u <user> COURSE_URL
+```
+
+Download with subtitles:
+
+```
+edx-helper -u <user> --with-subtitles COURSE_URL
+```
+
+Specify download directory：
+
+```
+edx-helper -u <user> -o ~/courses/ COURSE_URL
+```
+
+Specify additional downloads by extension:
+
+```
+edx-helper -u <user> --file-formats "png,jpg" COURSE_URL
+```
+
+Download CDN videos, do not download youtube videos:
+
+```
+edx-helper -u <user> --prefer-cdn-videos COURSE_URL
+```
+
 To see all available options and a brief description of what they do, simply
 execute:
 
@@ -105,38 +150,6 @@ execute:
 *Important Note:* To use sites other than <edx.org>, you **have** to specify the
 site along with the `-x` option. For example, `-x stanford`, if the course
 that you want to get is hosted on Stanford's site.
-
-### Examples
-
-Normal download:
-
-```
-edx-helper -u <user> https://learning.edx.org/course/course-v1:LinuxFoundationX+LFS158x+1T2022/home
-```
-
-Download with subtitles:
-
-```
-edx-helper -u <user> --with-subtitles https://learning.edx.org/course/course-v1:LinuxFoundationX+LFS158x+1T2022/home
-```
-
-Specify download directory：
-
-```
-edx-helper -u <user> -o ~/courses/ https://learning.edx.org/course/course-v1:LinuxFoundationX+LFS158x+1T2022/home
-```
-
-Specify additional downloads by extension:
-
-```
-edx-helper -u <user> --file-formats "png,jpg" https://learning.edx.org/course/course-v1:LinuxFoundationX+LFS158x+1T2022/home
-```
-
-Download CDN videos, do not download youtube videos:
-
-```
-edx-helper -u <user> --prefer-cdn-videos https://learning.edx.org/course/course-v1:LinuxFoundationX+LFS158x+1T2022/home
-```
 
 ## Troubleshooting
 
