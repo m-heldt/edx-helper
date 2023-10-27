@@ -144,7 +144,7 @@ def _display_courses(courses):
 
     for i, course in enumerate(courses, 1):
         logging.info('%2d - %s [%s]', i, course.course_name, course.course_id)
-        logging.info('     %s', course.url)
+        logging.info('     %s', course.course_url)
 
 
 def get_courses_info(url, headers):
@@ -1159,7 +1159,7 @@ def main():
                               for selected_course in selected_courses}
     else:
         all_chapter_blocks = {
-            selected_course: get_available_sections(selected_course.url.replace('info', 'courseware'), headers)
+            selected_course: get_available_sections(selected_course.course_url.replace('info', 'courseware'), headers)
             for selected_course in selected_courses}
 
     # selections = all_chapter_blocks
