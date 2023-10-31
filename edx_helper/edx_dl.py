@@ -477,8 +477,14 @@ def extract_units_from_vertical_block(vertical_block, headers, file_formats):
     """
     Parses a webpage and extracts its resources e.g. video_url, sub_url, etc.
     """
-    vertical_block_api = COURSE_XBLOCK_API + '/' + vertical_block.block_id + '?show_title=0&show_bookmark_button=0' \
-                                                                             '&recheck_access=1&view=student_view'
+    params = {
+        'exam_access': '',
+        'show_title': 1,
+        'show_bookmark': 0,
+        'recheck_access': 1,
+        'view': 'student_view'
+    }
+    vertical_block_api = COURSE_XBLOCK_API + '/' + vertical_block.block_id + '?%s' % urlencode(params)
     logging.debug("Extracting units from: \n'%s'", vertical_block_api)
 
     page_title = vertical_block.name
@@ -928,7 +934,7 @@ def download_unit(unit, args, target_dir, filename_prefix, headers):
                                          filename_prefix)
     skip_or_download(res_downloads, headers, args)
     if isinstance(unit, WebpageUnit):
-        file_name = filename_prefix + '-' + unit.page_title + '.html'
+        file_name = filename_prefix + '-' + clean_filename(unit.page_title) + '.html'
         file_path = os.path.join(target_dir, file_name)
         skip_or_save(file_path, unit.content)
 
