@@ -928,7 +928,8 @@ def download_unit(unit, args, target_dir, filename_prefix, headers):
                                          filename_prefix)
     skip_or_download(res_downloads, headers, args)
     if isinstance(unit, WebpageUnit):
-        file_path = os.path.join(target_dir, unit.page_title + '.html')
+        file_name = filename_prefix + '-' + unit.page_title + '.html'
+        file_path = os.path.join(target_dir, file_name)
         skip_or_save(file_path, unit.content)
 
 

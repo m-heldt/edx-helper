@@ -534,7 +534,8 @@ class RobustEdXPageExtractor(NewEdXPageExtractor):
         # block_type = re.findall(r'data-block-type="(.+?)"', page)
         # if [x for x in block_type if x in content_types]:
         #     units.append(WebpageUnit(page_title=page_title, content=page))
-        units.append(WebpageUnit(page_title=page_title, content=page))
+        new_page = self.absolute_path_page(page, BASE_URL)
+        units.append(WebpageUnit(page_title=page_title, content=new_page))
         return units
 
     def extract_unit(self, unit_soup, BASE_URL, file_formats):
@@ -601,6 +602,18 @@ class RobustEdXPageExtractor(NewEdXPageExtractor):
         resources_urls += youtube_links
 
         return resources_urls
+
+    def absolute_path_page(self, page, base_url):
+        """
+        Replace the relative path of the image on the page with an absolute path
+        return new page
+        """
+        soup = BeautifulSoup(page)
+        image_elements = soup.find_all('img')
+        for img_elem in image_elements:
+            if img_elem['src'].startswith('/'):
+                img_elem['src'] = base_url + img_elem['src']
+        return str(soup)
 
 
 def get_page_extractor(url):
