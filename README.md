@@ -97,14 +97,14 @@ edx-helper --help
 
 Run the following command to query the courses in which you are enrolled:
 
-    edx-helper -u <email or username> --list-courses
+    edx-helper -u <email> --list-courses
 
 ### Download course
 
 From there, choose the course you are interested in, copy its URL and use it
 in the following command:
 
-    edx-helper -u <email or username> COURSE_URL
+    edx-helper -u <email> COURSE_URL
 
 Your downloaded videos will be placed in a new directory called
 `Downloaded`, inside your current directory, but you can also choose another
