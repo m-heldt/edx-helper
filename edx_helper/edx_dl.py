@@ -854,17 +854,18 @@ def download_subtitle_without_name(url, target_dir, filename, headers):
     """
     Downloads the subtitle from the url
     """
-    response = requests.get(url, headers)
+    # response = requests.get(url, headers)
+    response = requests.get(url)
     if not filename:
         resp_headers = response.headers['Content-Disposition']
         m = re.compile(r'filename="(.*)"').search(resp_headers)
         if m:
             filename = m.group(1)
         else:
-            logging.warning('Not setting file name for: %s', url)
+            logging.error('Not setting file name for: %s', url)
             return
     file_path = os.path.join(target_dir, filename)
-    with open(file_path, 'wb', encoding='utf-8') as f:
+    with open(file_path, 'wb') as f:
         f.write(response.content)
 
 
