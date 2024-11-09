@@ -555,8 +555,8 @@ class RobustEdXPageExtractor(NewEdXPageExtractor):
                 subtitle_download_button = xblock.find('a', text=re.compile('^Download SubRip'))
                 if subtitle_download_button:
                     available_subs_url = BASE_URL + subtitle_download_button['href']
-                if not video_download_button and not subtitle_download_button:
-                    re_metadata = re.compile(r'data-metadata=&#39;(.*?)&#39;')
+                if not video_download_button or not subtitle_download_button:
+                    re_metadata = re.compile(r'data-metadata=\'(.*?)\'')
                     match_metadatas = re_metadata.findall(str(unit_soup))
                     for match_metadata in match_metadatas:
                         metadata = html.unescape(match_metadata)
