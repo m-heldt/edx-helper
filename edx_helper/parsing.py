@@ -19,9 +19,12 @@ else:
     from six.moves import html_parser
     html = html_parser.HTMLParser()
 
-# Force use of bs4 with html.parser
-BeautifulSoup = lambda page: BeautifulSoup_(page, 'html.parser')
 
+def BeautifulSoup(page):
+    """"
+    Force use of bs4 with html.parser
+    """
+    return BeautifulSoup_(page, 'html.parser')
 
 def edx_json2srt(o):
     """
